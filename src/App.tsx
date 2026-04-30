@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Layout, Plus, Eye, Share2 } from 'lucide-react';
 import { nanoid } from 'nanoid';
-import type { FormState, Question } from './types';
+import type { FormState, Question, FormResponse } from './types';
 import { QuestionCard } from './components/editor/QuestionCard';
+import { AnalyticsDashboard } from './components/responses/AnalyticsDashboard';
 import './index.css';
 
 const App: React.FC = () => {
@@ -43,6 +44,23 @@ const App: React.FC = () => {
       options: [{ id: nanoid(), text: 'Opción 1' }],
     };
     setForm(prev => ({ ...prev, questions: [...prev.questions, newQuestion] }));
+  };
+
+  const addMockResponse = () => {
+    const newResponse: FormResponse = {
+      id: nanoid(),
+      formId: form.metadata.id,
+      submittedAt: Date.now(),
+      answers: form.questions.reduce((acc, q) => {
+        if (q.options && q.options.length > 0) {
+          acc[q.id] = q.options[Math.floor(Math.random() * q.options.length)].text;
+        } else {
+          acc[q.id] = 'Respuesta de prueba';
+        }
+        return acc;
+      }, {} as Record<string, string | string[]>)
+    };
+    setForm(prev => ({ ...prev, responses: [...prev.responses, newResponse] }));
   };
 
   return (
@@ -134,10 +152,12 @@ const App: React.FC = () => {
 
         {activeTab === 'responses' && (
           <div className="responses-view">
-            <div className="premium-card">
-              <h2>{form.responses.length} respuestas</h2>
-              <p>No hay respuestas todavía. Publica tu formulario para comenzar a aceptar respuestas.</p>
+            <div className="mock-controls" style={{ marginBottom: '16px', textAlign: 'right' }}>
+              <button className="nav-icon-btn" onClick={addMockResponse} title="Simular respuesta">
+                Simular respuesta
+              </button>
             </div>
+            <AnalyticsDashboard form={form} />
           </div>
         )}
       </main>
