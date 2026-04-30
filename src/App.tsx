@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { nanoid } from 'nanoid';
-import { FormState, SavedForm, Question } from './types';
+import type { FormState, SavedForm, Question } from './types';
 import { Dashboard } from './components/layout/Dashboard';
 import { QuestionCard } from './components/editor/QuestionCard';
 import { AnalyticsDashboard } from './components/responses/AnalyticsDashboard';

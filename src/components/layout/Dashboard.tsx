@@ -1,6 +1,5 @@
-import React from 'react';
-import { Plus, Search, Menu, MoreVertical, LayoutGrid, List, ArrowDownWideArrow, Folder } from 'lucide-react';
-import { SavedForm } from '../../types';
+import { Plus, Search, Menu, MoreVertical, LayoutGrid, List, ChevronDown, Folder } from 'lucide-react';
+import type { SavedForm } from '../../types';
 
 interface Props {
   forms: SavedForm[];
@@ -42,7 +41,7 @@ export const Dashboard: React.FC<Props> = ({ forms, onCreateNew, onSelectForm })
             <span className="section-title">Iniciar un formulario nuevo</span>
             <div className="template-gallery-btn">
               Galería de plantillas
-              <ArrowDownWideArrow size={16} />
+              <ChevronDown size={16} />
             </div>
           </div>
           
@@ -72,10 +71,10 @@ export const Dashboard: React.FC<Props> = ({ forms, onCreateNew, onSelectForm })
           <div className="recent-header">
             <span className="section-title">Formularios recientes</span>
             <div className="recent-filters">
-              <button className="filter-btn">Cualquiera es el propietario <ArrowDownWideArrow size={14} /></button>
+              <button className="filter-btn">Cualquiera es el propietario <ChevronDown size={14} /></button>
               <div className="view-toggle">
                 <button className="icon-btn"><List size={20} /></button>
-                <button className="icon-btn"><ArrowDownWideArrow size={20} /></button>
+                <button className="icon-btn"><ChevronDown size={20} /></button>
                 <button className="icon-btn"><Folder size={20} /></button>
               </div>
             </div>
