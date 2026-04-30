@@ -33,3 +33,10 @@ export interface FormState {
   questions: Question[];
   responses: FormResponse[];
 }
+
+export interface SavedForm {
+  id: string;
+  title: string;
+  lastModified: number;
+  data: FormState;
+}
