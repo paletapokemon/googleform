@@ -1,122 +1,242 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import React, { useState, useEffect } from 'react';
+import { Layout, Plus, PieChart, Settings, Eye, Send, Share2 } from 'lucide-react';
+import { nanoid } from 'nanoid';
+import { FormState, Question, FormResponse } from './types';
+import './index.css';
 
-function App() {
-  const [count, setCount] = useState(0)
+const App: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<'questions' | 'responses' | 'settings'>('questions');
+  const [form, setForm] = useState<FormState>(() => {
+    const saved = localStorage.getItem('google-form-clone');
+    if (saved) return JSON.parse(saved);
+    return {
+      metadata: {
+        id: nanoid(),
+        title: 'Formulario sin título',
+        description: '',
+        createdAt: Date.now(),
+      },
+      questions: [
+        {
+          id: nanoid(),
+          type: 'multiple_choice',
+          title: 'Pregunta sin título',
+          required: false,
+          options: [{ id: nanoid(), text: 'Opción 1' }],
+        },
+      ],
+      responses: [],
+    };
+  });
+
+  useEffect(() => {
+    localStorage.setItem('google-form-clone', JSON.stringify(form));
+  }, [form]);
+
+  const addQuestion = () => {
+    const newQuestion: Question = {
+      id: nanoid(),
+      type: 'multiple_choice',
+      title: '',
+      required: false,
+      options: [{ id: nanoid(), text: 'Opción 1' }],
+    };
+    setForm(prev => ({ ...prev, questions: [...prev.questions, newQuestion] }));
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className="app-container">
+      {/* Header / Navbar */}
+      <nav className="navbar">
+        <div className="nav-top">
+          <div className="nav-left">
+            <Layout className="nav-logo" size={24} color="#673ab7" />
+            <input 
+              className="nav-title-input" 
+              value={form.metadata.title}
+              onChange={(e) => setForm(prev => ({ ...prev, metadata: { ...prev.metadata, title: e.target.value } }))}
+            />
+          </div>
+          <div className="nav-right">
+            <button className="nav-icon-btn"><Eye size={20} /></button>
+            <button className="nav-icon-btn"><Share2 size={20} /></button>
+            <button className="send-btn">Enviar</button>
+          </div>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
+        <div className="nav-tabs">
+          <button 
+            className={`tab ${activeTab === 'questions' ? 'active' : ''}`}
+            onClick={() => setActiveTab('questions')}
+          >
+            Preguntas
+          </button>
+          <button 
+            className={`tab ${activeTab === 'responses' ? 'active' : ''}`}
+            onClick={() => setActiveTab('responses')}
+          >
+            Respuestas
+            <span className="response-count">{form.responses.length}</span>
+          </button>
+          <button 
+            className={`tab ${activeTab === 'settings' ? 'active' : ''}`}
+            onClick={() => setActiveTab('settings')}
+          >
+            Configuración
+          </button>
         </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+      </nav>
 
-      <div className="ticks"></div>
+      <main className="form-content">
+        {activeTab === 'questions' && (
+          <div className="editor-view">
+            <div className="premium-card active-accent header-card">
+              <input 
+                className="form-title" 
+                placeholder="Título del formulario"
+                value={form.metadata.title}
+                onChange={(e) => setForm(prev => ({ ...prev, metadata: { ...prev.metadata, title: e.target.value } }))}
+              />
+              <textarea 
+                className="form-description" 
+                placeholder="Descripción del formulario"
+                value={form.metadata.description}
+                onChange={(e) => setForm(prev => ({ ...prev, metadata: { ...prev.metadata, description: e.target.value } }))}
+              />
+            </div>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+            {form.questions.map((q, idx) => (
+              <div key={q.id} className="premium-card fade-in">
+                <div className="question-editor">
+                  <div className="q-row">
+                    <input 
+                      className="q-title" 
+                      placeholder="Pregunta"
+                      value={q.title}
+                      onChange={(e) => {
+                        const newQs = [...form.questions];
+                        newQs[idx].title = e.target.value;
+                        setForm(prev => ({ ...prev, questions: newQs }));
+                      }}
+                    />
+                    <select className="type-select">
+                      <option value="multiple_choice">Opción múltiple</option>
+                      <option value="text">Respuesta breve</option>
+                      <option value="checkboxes">Casillas de verificación</option>
+                    </select>
+                  </div>
+                  {/* Options will go here */}
+                </div>
+              </div>
+            ))}
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
-}
+            <button className="fab-add" onClick={addQuestion}>
+              <Plus size={24} />
+            </button>
+          </div>
+        )}
 
-export default App
+        {activeTab === 'responses' && (
+          <div className="responses-view">
+            <div className="premium-card">
+              <h2>{form.responses.length} respuestas</h2>
+              <p>No hay respuestas todavía. Publica tu formulario para comenzar a aceptar respuestas.</p>
+            </div>
+          </div>
+        )}
+      </main>
+
+      <style>{`
+        .navbar {
+          background: white;
+          padding-top: 12px;
+          position: sticky;
+          top: 0;
+          z-index: 100;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .nav-top {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0 24px;
+          margin-bottom: 8px;
+        }
+        .nav-left { display: flex; align-items: center; gap: 12px; }
+        .nav-title-input { font-size: 18px; border-bottom: 1px solid transparent; width: auto; }
+        .nav-title-input:focus { border-bottom: 1px solid var(--border); }
+        .nav-right { display: flex; align-items: center; gap: 16px; }
+        .nav-icon-btn { color: var(--text-secondary); padding: 8px; border-radius: 50%; }
+        .nav-icon-btn:hover { background: #f1f3f4; }
+        .send-btn {
+          background: var(--primary);
+          color: white;
+          padding: 10px 24px;
+          border-radius: 4px;
+          font-weight: 500;
+        }
+        .nav-tabs {
+          display: flex;
+          justify-content: center;
+          gap: 24px;
+        }
+        .tab {
+          padding: 8px 16px;
+          font-size: 14px;
+          font-weight: 500;
+          color: var(--text-secondary);
+          border-bottom: 3px solid transparent;
+        }
+        .tab.active {
+          color: var(--primary);
+          border-bottom-color: var(--primary);
+        }
+        .response-count {
+          margin-left: 6px;
+          background: #eee;
+          padding: 2px 6px;
+          border-radius: 10px;
+          font-size: 12px;
+        }
+        .form-content {
+          max-width: 770px;
+          margin: 20px auto;
+          padding: 0 15px;
+        }
+        .header-card {
+          border-top: 10px solid var(--primary);
+        }
+        .q-row {
+          display: flex;
+          gap: 16px;
+          margin-bottom: 16px;
+        }
+        .q-title {
+          background: #f1f3f4;
+          padding: 16px;
+          font-size: 16px;
+          border-bottom: 1px solid var(--border);
+        }
+        .type-select {
+          padding: 8px;
+          border: 1px solid var(--border);
+          border-radius: 4px;
+        }
+        .fab-add {
+          position: fixed;
+          right: calc(50% - 440px);
+          top: 200px;
+          background: white;
+          padding: 12px;
+          border-radius: 8px;
+          box-shadow: var(--shadow-sm);
+          color: var(--text-secondary);
+        }
+        @media (max-width: 900px) {
+          .fab-add { bottom: 20px; top: auto; right: 20px; border-radius: 50%; }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default App;
