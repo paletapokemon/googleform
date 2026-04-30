@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Layout, Plus, PieChart, Settings, Eye, Send, Share2 } from 'lucide-react';
 import { nanoid } from 'nanoid';
 import { FormState, Question, FormResponse } from './types';
+import { QuestionCard } from './components/editor/QuestionCard';
 import './index.css';
 
 const App: React.FC = () => {
@@ -105,28 +106,24 @@ const App: React.FC = () => {
             </div>
 
             {form.questions.map((q, idx) => (
-              <div key={q.id} className="premium-card fade-in">
-                <div className="question-editor">
-                  <div className="q-row">
-                    <input 
-                      className="q-title" 
-                      placeholder="Pregunta"
-                      value={q.title}
-                      onChange={(e) => {
-                        const newQs = [...form.questions];
-                        newQs[idx].title = e.target.value;
-                        setForm(prev => ({ ...prev, questions: newQs }));
-                      }}
-                    />
-                    <select className="type-select">
-                      <option value="multiple_choice">Opción múltiple</option>
-                      <option value="text">Respuesta breve</option>
-                      <option value="checkboxes">Casillas de verificación</option>
-                    </select>
-                  </div>
-                  {/* Options will go here */}
-                </div>
-              </div>
+              <QuestionCard 
+                key={q.id}
+                question={q}
+                onUpdate={(updated) => {
+                  const newQs = [...form.questions];
+                  newQs[idx] = updated;
+                  setForm(prev => ({ ...prev, questions: newQs }));
+                }}
+                onDelete={() => {
+                  setForm(prev => ({ ...prev, questions: prev.questions.filter((_, i) => i !== idx) }));
+                }}
+                onDuplicate={() => {
+                  const duplicated = { ...q, id: nanoid() };
+                  const newQs = [...form.questions];
+                  newQs.splice(idx + 1, 0, duplicated);
+                  setForm(prev => ({ ...prev, questions: newQs }));
+                }}
+              />
             ))}
 
             <button className="fab-add" onClick={addQuestion}>
