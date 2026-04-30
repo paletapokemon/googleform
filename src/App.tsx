@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, Plus, PieChart, Settings, Eye, Send, Share2 } from 'lucide-react';
+import { Layout, Plus, Eye, Share2 } from 'lucide-react';
 import { nanoid } from 'nanoid';
-import { FormState, Question, FormResponse } from './types';
+import type { FormState, Question } from './types';
 import { QuestionCard } from './components/editor/QuestionCard';
 import './index.css';
 

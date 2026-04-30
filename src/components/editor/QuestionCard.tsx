@@ -1,6 +1,5 @@
-import React from 'react';
-import { Trash2, Copy, GripVertical, MoreVertical, CheckCircle2 } from 'lucide-react';
-import { Question, Option } from '../types';
+import { Trash2, Copy, GripVertical, MoreVertical } from 'lucide-react';
+import type { Question, Option } from '../../types';
 import { nanoid } from 'nanoid';
 
 interface Props {
@@ -19,14 +18,14 @@ export const QuestionCard: React.FC<Props> = ({ question, onUpdate, onDelete, on
   const updateOption = (id: string, text: string) => {
     onUpdate({
       ...question,
-      options: question.options?.map(o => o.id === id ? { ...o, text } : o)
+      options: question.options?.map((o: Option) => o.id === id ? { ...o, text } : o)
     });
   };
 
   const removeOption = (id: string) => {
     onUpdate({
       ...question,
-      options: question.options?.filter(o => o.id !== id)
+      options: question.options?.filter((o: Option) => o.id !== id)
     });
   };
 
@@ -59,7 +58,7 @@ export const QuestionCard: React.FC<Props> = ({ question, onUpdate, onDelete, on
       <div className="q-options-area">
         {(question.type === 'multiple_choice' || question.type === 'checkboxes' || question.type === 'dropdown') && (
           <div className="options-list">
-            {question.options?.map((opt, i) => (
+            {question.options?.map((opt: Option, i: number) => (
               <div key={opt.id} className="option-row">
                 <div className="option-marker">
                   {question.type === 'multiple_choice' && <div className="radio-circle" />}
