@@ -16,6 +16,7 @@ const App: React.FC = () => {
   const [currentFormId, setCurrentFormId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [isThemeSidebarOpen, setIsThemeSidebarOpen] = useState(false);
+  const [activeElementId, setActiveElementId] = useState<string | null>('header'); // To track which card the floating toolbar sticks to
 
   // Fetch all forms on mount
   useEffect(() => {
@@ -136,6 +137,7 @@ const App: React.FC = () => {
         }
         return f;
       }));
+      setActiveElementId(newQ.id);
     } catch (e) {
       console.error(e);
     }
@@ -162,6 +164,12 @@ const App: React.FC = () => {
 
   if (loading || !currentForm) return <div>Cargando editor...</div>;
 
+  const handleShare = () => {
+    const url = `${window.location.origin}/form/${currentForm.metadata.id}`;
+    navigator.clipboard.writeText(url);
+    alert('Enlace copiado al portapapeles: ' + url);
+  };
+
   const settings = currentForm.metadata.settings as any || {};
 
   return (
@@ -181,7 +189,7 @@ const App: React.FC = () => {
             <button className="nav-icon-btn" onClick={() => setIsThemeSidebarOpen(true)} title="Personalizar tema"><Palette size={20} /></button>
             <button className="nav-icon-btn" title="Vista previa"><Eye size={20} /></button>
             <button className="nav-icon-btn" title="Deshacer"><Share2 size={20} /></button>
-            <button className="send-btn">Enviar</button>
+            <button className="send-btn" onClick={handleShare}>Enviar</button>
             <div style={{ width: 32, height: 32, borderRadius: '50%', backgroundColor: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>A</div>
           </div>
         </div>
@@ -209,7 +217,11 @@ const App: React.FC = () => {
               <img src={settings.theme.headerImage} alt="Form Header" className="top-header-banner" />
             )}
 
-            <div className="premium-card active header-card" style={{ borderTop: '8px solid var(--primary)', borderRadius: '8px', padding: '24px', backgroundColor: 'white', marginBottom: '12px' }}>
+            <div 
+              className={`premium-card header-card ${activeElementId === 'header' ? 'active' : ''}`} 
+              style={{ borderTop: '8px solid var(--primary)', borderRadius: '8px', padding: '24px', backgroundColor: 'white', marginBottom: '12px', position: 'relative' }}
+              onClick={() => setActiveElementId('header')}
+            >
               <input 
                 className="form-title" 
                 placeholder="Título del formulario"
@@ -224,25 +236,33 @@ const App: React.FC = () => {
                 onChange={(e) => updateFormMetadata({ description: e.target.value })}
                 style={{ width: '100%', border: 'none', borderBottom: '1px solid transparent', outline: 'none', marginTop: '8px', minHeight: '24px' }}
               />
+              {activeElementId === 'header' && (
+                <FloatingToolbar 
+                  onAddQuestion={addQuestion} 
+                  onAddImage={() => alert('Función de agregar imagen')} 
+                />
+              )}
             </div>
 
             {currentForm.questions.map((q, idx) => (
-              <QuestionCard 
-                key={q.id}
-                question={q}
-                onUpdate={(updated) => updateQuestion(idx, updated)}
-                onDelete={() => deleteQuestion(idx, q.id)}
-                onDuplicate={() => {
-                  // Implement duplicate via API if needed, for now just add a new one
-                  addQuestion();
-                }}
-              />
+              <div key={q.id} style={{ position: 'relative' }} onClick={() => setActiveElementId(q.id)}>
+                <QuestionCard 
+                  question={q}
+                  isActive={activeElementId === q.id}
+                  onUpdate={(updated) => updateQuestion(idx, updated)}
+                  onDelete={() => deleteQuestion(idx, q.id)}
+                  onDuplicate={() => addQuestion()}
+                />
+                
+                {/* Ensure FloatingToolbar mounts alongside the active card */}
+                {activeElementId === q.id && (
+                  <FloatingToolbar 
+                    onAddQuestion={addQuestion} 
+                    onAddImage={() => alert('Función de agregar imagen')} 
+                  />
+                )}
+              </div>
             ))}
-            
-            <FloatingToolbar 
-              onAddQuestion={addQuestion} 
-              onAddImage={() => alert('Función de agregar imagen flotante')} 
-            />
           </div>
         )}
 

@@ -5,12 +5,13 @@ import { useRef } from 'react';
 
 interface Props {
   question: Question;
+  isActive: boolean;
   onUpdate: (updated: Question) => void;
   onDelete: () => void;
   onDuplicate: () => void;
 }
 
-export const QuestionCard: React.FC<Props> = ({ question, onUpdate, onDelete, onDuplicate }) => {
+export const QuestionCard: React.FC<Props> = ({ question, isActive, onUpdate, onDelete, onDuplicate }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const addOption = () => {
@@ -33,7 +34,7 @@ export const QuestionCard: React.FC<Props> = ({ question, onUpdate, onDelete, on
   };
 
   return (
-    <div className="premium-card fade-in active-focus" style={{ borderLeft: '6px solid var(--primary)' }}>
+    <div className={`premium-card fade-in ${isActive ? 'active' : ''}`} style={{ borderLeft: isActive ? '6px solid var(--primary)' : '1px solid var(--border)' }}>
       <div className="card-drag-handle">
         <GripVertical size={16} color="#dadce0" />
       </div>
