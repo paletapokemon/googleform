@@ -1,37 +1,40 @@
-export type QuestionType = 'text' | 'paragraph' | 'multiple_choice' | 'checkboxes' | 'dropdown';
+import { Database } from './lib/database.types';
+
+export type DbForm = Database['public']['Tables']['forms']['Row'];
+export type DbQuestion = Database['public']['Tables']['questions']['Row'];
+export type DbResponse = Database['public']['Tables']['responses']['Row'];
+export type DbAnswer = Database['public']['Tables']['answers']['Row'];
+
+export type QuestionType = 
+  | 'short_text' 
+  | 'paragraph' 
+  | 'multiple_choice' 
+  | 'checkboxes' 
+  | 'dropdown'
+  | 'file_upload'
+  | 'linear_scale'
+  | 'multiple_choice_grid'
+  | 'checkbox_grid'
+  | 'date'
+  | 'time';
 
 export interface Option {
   id: string;
   text: string;
+  image?: string;
 }
 
-export interface Question {
-  id: string;
+// For UI state representation before saving, or when joined
+export interface Question extends Omit<DbQuestion, 'type' | 'options'> {
   type: QuestionType;
-  title: string;
-  description?: string;
-  required: boolean;
-  options?: Option[];
-}
-
-export interface FormMetadata {
-  id: string;
-  title: string;
-  description: string;
-  createdAt: number;
-}
-
-export interface FormResponse {
-  id: string;
-  formId: string;
-  submittedAt: number;
-  answers: Record<string, string | string[]>;
+  options: Option[] | null;
+  // additional transient UI state can go here if needed
 }
 
 export interface FormState {
-  metadata: FormMetadata;
+  metadata: DbForm;
   questions: Question[];
-  responses: FormResponse[];
+  responses: DbResponse[];
 }
 
 export interface SavedForm {
