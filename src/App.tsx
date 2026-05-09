@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import type { FormState, SavedForm, Question, DbForm } from './types';
+import React, { useState, useEffect } from 'react';
+import type { SavedForm, Question, DbForm } from './types';
 import { Dashboard } from './components/layout/Dashboard';
 import { QuestionCard } from './components/editor/QuestionCard';
 import { AnalyticsDashboard } from './components/responses/AnalyticsDashboard';
@@ -92,7 +92,7 @@ const App: React.FC = () => {
       if (f.id === currentFormId) {
         return { 
           ...f, 
-          title: updates.title !== undefined ? updates.title : f.title,
+          title: updates.title !== undefined ? (updates.title || 'Formulario sin título') : f.title,
           data: { ...f.data, metadata: { ...f.data.metadata, ...updates } } 
         };
       }

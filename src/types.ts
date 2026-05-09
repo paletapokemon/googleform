@@ -1,4 +1,4 @@
-import { Database } from './lib/database.types';
+import type { Database } from './lib/database.types';
 
 export type DbForm = Database['public']['Tables']['forms']['Row'];
 export type DbQuestion = Database['public']['Tables']['questions']['Row'];
@@ -34,7 +34,7 @@ export interface Question extends Omit<DbQuestion, 'type' | 'options'> {
 export interface FormState {
   metadata: DbForm;
   questions: Question[];
-  responses: DbResponse[];
+  responses: (DbResponse & { answers: Record<string, any> })[];
 }
 
 export interface SavedForm {

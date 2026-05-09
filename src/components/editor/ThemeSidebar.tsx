@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { X, Image as ImageIcon, Upload } from 'lucide-react';
+import { X, Image as ImageIcon } from 'lucide-react';
 import { api } from '../../lib/api';
 
 interface ThemeSidebarProps {
