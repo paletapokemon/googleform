@@ -50,6 +50,38 @@ export const api = {
 
     if (qError) throw qError;
 
+    // Fetch responses for this form
+    const { data: responses, error: rError } = await supabase
+      .from('responses')
+      .select('*')
+      .eq('form_id', id)
+      .order('submitted_at', { ascending: false });
+
+    if (rError) throw rError;
+
+    // Fetch answers for all responses of this form
+    const { data: allAnswers, error: aError } = await supabase
+      .from('answers')
+      .select('*')
+      .in('response_id', (responses || []).map(r => r.id));
+
+    if (aError) throw aError;
+
+    // Group answers by response_id
+    const responsesWithAnswers = (responses || []).map(r => {
+      const respAnswers = (allAnswers || [])
+        .filter(a => a.response_id === r.id)
+        .reduce((acc, curr) => {
+          if (curr.question_id) acc[curr.question_id] = curr.value;
+          return acc;
+        }, {} as Record<string, any>);
+      
+      return {
+        ...r,
+        answers: respAnswers
+      };
+    });
+
     return {
       metadata: form as DbForm,
       questions: (questions || []).map(q => ({
@@ -57,7 +89,7 @@ export const api = {
         type: q.type as QuestionType,
         options: q.options as Option[] | null
       })) as Question[],
-      responses: [] // To be fetched separately if needed
+      responses: responsesWithAnswers
     };
   },
 

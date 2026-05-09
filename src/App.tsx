@@ -215,7 +215,10 @@ const App: React.FC = () => {
         </div>
         <div className="nav-tabs">
           <button className={`tab ${activeTab === 'questions' ? 'active' : ''}`} onClick={() => setActiveTab('questions')}>Preguntas</button>
-          <button className={`tab ${activeTab === 'responses' ? 'active' : ''}`} onClick={() => setActiveTab('responses')}>
+          <button className={`tab ${activeTab === 'responses' ? 'active' : ''}`} onClick={() => {
+            setActiveTab('responses');
+            if (currentFormId) selectForm(currentFormId); // Refresh data
+          }}>
             Respuestas <span className="response-count">{currentForm.responses.length}</span>
           </button>
           <button className={`tab ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>Configuración</button>
