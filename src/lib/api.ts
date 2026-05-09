@@ -144,5 +144,32 @@ export const api = {
       .getPublicUrl(filePath);
 
     return data.publicUrl;
+  },
+
+  // Responses
+  async submitResponse(formId: string, answers: Record<string, any>, email: string) {
+    const { data: response, error: respError } = await supabase
+      .from('responses')
+      .insert({
+        form_id: formId,
+        respondent_email: email,
+        submitted_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+
+    if (respError) throw respError;
+
+    const answerInserts = Object.entries(answers).map(([qId, value]) => ({
+      response_id: response.id,
+      question_id: qId,
+      value: value
+    }));
+
+    const { error: ansError } = await supabase
+      .from('answers')
+      .insert(answerInserts);
+
+    if (ansError) throw ansError;
   }
 };

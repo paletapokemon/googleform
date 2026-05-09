@@ -1,7 +1,8 @@
-import { Trash2, Copy, GripVertical, MoreVertical, Image as ImageIcon } from 'lucide-react';
+import { Trash2, Copy, GripVertical, MoreVertical, Image as ImageIcon, MoreHorizontal, AlignLeft, AlignCenter, AlignRight, X } from 'lucide-react';
 import type { Question, Option } from '../../types';
 import { nanoid } from 'nanoid';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
+import { api } from '../../lib/api';
 
 interface Props {
   question: Question;
@@ -13,6 +14,24 @@ interface Props {
 
 export const QuestionCard: React.FC<Props> = ({ question, isActive, onUpdate, onDelete, onDuplicate }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isAlignMenuOpen, setIsAlignMenuOpen] = useState(false);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const url = await api.uploadImage(file);
+      onUpdate({ ...question, image_url: url, image_align: 'left' });
+    } catch (err) {
+      console.error('Error uploading image', err);
+      alert('Error al subir la imagen');
+    }
+  };
+
+  const removeImage = () => {
+    onUpdate({ ...question, image_url: null, image_align: null });
+  };
 
   const addOption = () => {
     const newOption: Option = { id: nanoid(), text: `Opción ${question.options?.length ? question.options.length + 1 : 1}` };
@@ -49,7 +68,7 @@ export const QuestionCard: React.FC<Props> = ({ question, isActive, onUpdate, on
         <button className="icon-btn" title="Agregar imagen" onClick={() => fileInputRef.current?.click()} style={{ marginRight: 16 }}>
           <ImageIcon size={24} color="var(--text-secondary)" />
         </button>
-        <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept="image/*" />
+        <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept="image/*" onChange={handleImageUpload} />
 
         <select 
           className="type-select"
@@ -74,6 +93,41 @@ export const QuestionCard: React.FC<Props> = ({ question, isActive, onUpdate, on
           <option value="time">Hora</option>
         </select>
       </div>
+
+      {question.image_url && (
+        <div className={`q-image-container align-${question.image_align || 'left'}`} style={{ marginBottom: 24, position: 'relative', display: 'flex', justifyContent: question.image_align === 'center' ? 'center' : question.image_align === 'right' ? 'flex-end' : 'flex-start' }}>
+          <div style={{ position: 'relative', maxWidth: '100%' }}>
+            <img src={question.image_url} alt="Question" style={{ maxWidth: '100%', borderRadius: 4, display: 'block' }} />
+            <div className="image-actions" style={{ position: 'absolute', top: 8, left: 8, display: 'flex', gap: 4 }}>
+              <button 
+                type="button" 
+                className="image-menu-btn" 
+                onClick={(e) => { e.stopPropagation(); setIsAlignMenuOpen(!isAlignMenuOpen); }}
+                style={{ backgroundColor: 'white', borderRadius: '50%', padding: 8, boxShadow: '0 1px 3px rgba(0,0,0,0.3)', display: 'flex' }}
+              >
+                <MoreHorizontal size={18} />
+              </button>
+              {isAlignMenuOpen && (
+                <div className="align-menu" style={{ position: 'absolute', top: 40, left: 0, backgroundColor: 'white', border: '1px solid var(--border)', borderRadius: 4, boxShadow: 'var(--shadow-md)', zIndex: 20, display: 'flex', flexDirection: 'column', width: 150 }}>
+                  <button onClick={() => { onUpdate({...question, image_align: 'left'}); setIsAlignMenuOpen(false); }} className="menu-item"><AlignLeft size={16} /> Alineación izquierda</button>
+                  <button onClick={() => { onUpdate({...question, image_align: 'center'}); setIsAlignMenuOpen(false); }} className="menu-item"><AlignCenter size={16} /> Centrar</button>
+                  <button onClick={() => { onUpdate({...question, image_align: 'right'}); setIsAlignMenuOpen(false); }} className="menu-item"><AlignRight size={16} /> Alineación derecha</button>
+                  <hr style={{ margin: '4px 0', border: 'none', borderTop: '1px solid var(--border)' }} />
+                  <button onClick={() => { fileInputRef.current?.click(); setIsAlignMenuOpen(false); }} className="menu-item"><ImageIcon size={16} /> Cambiar</button>
+                  <button onClick={() => { removeImage(); setIsAlignMenuOpen(false); }} className="menu-item" style={{ color: 'red' }}><Trash2 size={16} /> Quitar</button>
+                </div>
+              )}
+            </div>
+            <button 
+              type="button" 
+              onClick={removeImage}
+              style={{ position: 'absolute', top: 8, right: 8, backgroundColor: 'white', borderRadius: '50%', padding: 4, boxShadow: '0 1px 3px rgba(0,0,0,0.3)', display: 'flex' }}
+            >
+              <X size={16} />
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="q-options-area">
         {(question.type === 'multiple_choice' || question.type === 'checkboxes' || question.type === 'dropdown') && (
@@ -181,6 +235,23 @@ export const QuestionCard: React.FC<Props> = ({ question, isActive, onUpdate, on
         .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: -2px; bottom: -3px; background-color: #fff; transition: .4s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
         input:checked + .slider { background-color: var(--primary-light); }
         input:checked + .slider:before { transform: translateX(20px); background-color: var(--primary); }
+
+        .menu-item {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 10px 16px;
+          font-size: 14px;
+          color: var(--text-primary);
+          width: 100%;
+          text-align: left;
+        }
+        .menu-item:hover {
+          background-color: #f1f3f4;
+        }
+        .image-menu-btn:hover {
+          background-color: #f1f3f4 !important;
+        }
       `}</style>
     </div>
   );

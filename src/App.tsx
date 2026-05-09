@@ -5,6 +5,8 @@ import { QuestionCard } from './components/editor/QuestionCard';
 import { AnalyticsDashboard } from './components/responses/AnalyticsDashboard';
 import { ThemeSidebar } from './components/editor/ThemeSidebar';
 import { FloatingToolbar } from './components/editor/FloatingToolbar';
+import { RichTextToolbar } from './components/editor/RichTextToolbar';
+import { PublicFormView } from './components/responses/PublicFormView';
 import { Layout, Eye, Share2, ArrowLeft, Palette } from 'lucide-react';
 import { api } from './lib/api';
 import './index.css';
@@ -17,6 +19,16 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isThemeSidebarOpen, setIsThemeSidebarOpen] = useState(false);
   const [activeElementId, setActiveElementId] = useState<string | null>('header'); // To track which card the floating toolbar sticks to
+  const [publicFormId, setPublicFormId] = useState<string | null>(null);
+
+  // Simple routing detection
+  useEffect(() => {
+    const path = window.location.pathname;
+    if (path.startsWith('/form/')) {
+      const id = path.split('/form/')[1];
+      if (id) setPublicFormId(id);
+    }
+  }, []);
 
   // Fetch all forms on mount
   useEffect(() => {
@@ -158,6 +170,10 @@ const App: React.FC = () => {
     }
   };
 
+  if (publicFormId) {
+    return <PublicFormView formId={publicFormId} />;
+  }
+
   if (view === 'dashboard') {
     return loading ? <div>Cargando...</div> : <Dashboard forms={forms} onCreateNew={createNewForm} onSelectForm={selectForm} />;
   }
@@ -168,6 +184,10 @@ const App: React.FC = () => {
     const url = `${window.location.origin}/form/${currentForm.metadata.id}`;
     navigator.clipboard.writeText(url);
     alert('Enlace copiado al portapapeles: ' + url);
+  };
+
+  const handleFormat = (command: string, value?: string) => {
+    document.execCommand(command, false, value);
   };
 
   const settings = currentForm.metadata.settings as any || {};
@@ -222,19 +242,24 @@ const App: React.FC = () => {
               style={{ borderTop: '8px solid var(--primary)', borderRadius: '8px', padding: '24px', backgroundColor: 'white', marginBottom: '12px', position: 'relative' }}
               onClick={() => setActiveElementId('header')}
             >
-              <input 
-                className="form-title" 
-                placeholder="Título del formulario"
-                value={currentForm.metadata.title || ''}
-                onChange={(e) => updateFormMetadata({ title: e.target.value })}
-                style={{ fontSize: '32px', width: '100%', border: 'none', borderBottom: '1px solid transparent', outline: 'none' }}
+              {activeElementId === 'header' && (
+                <RichTextToolbar onFormat={handleFormat} />
+              )}
+              <div
+                className="form-title"
+                contentEditable
+                suppressContentEditableWarning
+                onBlur={(e) => updateFormMetadata({ title: e.currentTarget.innerHTML })}
+                dangerouslySetInnerHTML={{ __html: currentForm.metadata.title || 'Formulario sin título' }}
+                style={{ fontSize: '32px', width: '100%', border: 'none', borderBottom: '1px solid #dadce0', outline: 'none', minHeight: '40px', marginBottom: '8px' }}
               />
-              <textarea 
-                className="form-description" 
-                placeholder="Descripción del formulario"
-                value={currentForm.metadata.description || ''}
-                onChange={(e) => updateFormMetadata({ description: e.target.value })}
-                style={{ width: '100%', border: 'none', borderBottom: '1px solid transparent', outline: 'none', marginTop: '8px', minHeight: '24px' }}
+              <div
+                className="form-description"
+                contentEditable
+                suppressContentEditableWarning
+                onBlur={(e) => updateFormMetadata({ description: e.currentTarget.innerHTML })}
+                dangerouslySetInnerHTML={{ __html: currentForm.metadata.description || 'Descripción del formulario' }}
+                style={{ width: '100%', border: 'none', borderBottom: '1px solid #dadce0', outline: 'none', marginTop: '8px', minHeight: '24px' }}
               />
               {activeElementId === 'header' && (
                 <FloatingToolbar 

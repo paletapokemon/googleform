@@ -28,7 +28,8 @@ export interface Option {
 export interface Question extends Omit<DbQuestion, 'type' | 'options'> {
   type: QuestionType;
   options: Option[] | null;
-  // additional transient UI state can go here if needed
+  image_url?: string | null;
+  image_align?: 'left' | 'center' | 'right' | null;
 }
 
 export interface FormState {

@@ -15,11 +15,19 @@ const THEME_COLORS = [
   '#4285f4', // Blue
   '#03a9f4', // Light Blue
   '#00bcd4', // Cyan
+  '#4caf50', // Green
+  '#8bc34a', // Light Green
+  '#ffeb3b', // Yellow
+  '#ffc107', // Amber
   '#ff9800', // Orange
   '#ff5722', // Deep Orange
-  '#607d8b', // Blue Grey
+  '#795548', // Brown
   '#9e9e9e', // Grey
+  '#607d8b', // Blue Grey
 ];
+
+const FONTS = ['Roboto', 'Arial', 'Times New Roman', 'Georgia', 'Verdana', 'Courier New'];
+const FONT_SIZES = ['10', '11', '12', '14', '16', '18', '24', '32'];
 
 export const ThemeSidebar: React.FC<ThemeSidebarProps> = ({
   onClose,
@@ -49,6 +57,42 @@ export const ThemeSidebar: React.FC<ThemeSidebarProps> = ({
           <X size={20} />
         </button>
       </div>
+
+      <div style={{ marginBottom: '24px' }}>
+        <h4 style={{ fontSize: '14px', color: 'var(--text-primary)', marginBottom: '16px', fontWeight: 500 }}>Estilo de texto</h4>
+        
+        {['header', 'question', 'text'].map((type) => (
+          <div key={type} style={{ marginBottom: '16px' }}>
+            <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '8px' }}>
+              {type === 'header' ? 'Encabezado' : type === 'question' ? 'Pregunta' : 'Texto'}
+            </label>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <select 
+                value={(currentTheme as any).fonts?.[type]?.family || 'Roboto'}
+                onChange={(e) => onUpdateTheme({
+                  ...currentTheme,
+                  fonts: { ...(currentTheme as any).fonts, [type]: { ...(currentTheme as any).fonts?.[type], family: e.target.value } }
+                })}
+                style={{ flex: 1, padding: '8px', border: '1px solid var(--border)', borderRadius: '4px' }}
+              >
+                {FONTS.map(f => <option key={f} value={f}>{f}</option>)}
+              </select>
+              <select 
+                value={(currentTheme as any).fonts?.[type]?.size || (type === 'header' ? '24' : type === 'question' ? '12' : '11')}
+                onChange={(e) => onUpdateTheme({
+                  ...currentTheme,
+                  fonts: { ...(currentTheme as any).fonts, [type]: { ...(currentTheme as any).fonts?.[type], size: e.target.value } }
+                })}
+                style={{ width: '60px', padding: '8px', border: '1px solid var(--border)', borderRadius: '4px' }}
+              >
+                {FONT_SIZES.map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <hr style={{ margin: '24px 0', border: 'none', borderTop: '1px solid var(--border)' }} />
 
       <div style={{ marginBottom: '24px' }}>
         <h4 style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '12px' }}>Encabezado</h4>
