@@ -82,14 +82,15 @@ const App: React.FC = () => {
     }
   };
 
-  const selectForm = async (id: string) => {
+  const selectForm = async (id: string, targetTab?: 'questions' | 'responses' | 'settings') => {
     setLoading(true);
     try {
       const fullForm = await api.getFormById(id);
       setForms(prev => prev.map(f => f.id === id ? { ...f, data: fullForm } : f));
       setCurrentFormId(id);
       setView('editor');
-      setActiveTab('questions');
+      if (targetTab) setActiveTab(targetTab);
+      else if (!currentFormId) setActiveTab('questions'); // Only reset if opening a new form
     } catch (e) {
       console.error(e);
       alert('Error cargando el formulario');
@@ -175,10 +176,20 @@ const App: React.FC = () => {
   }
 
   if (view === 'dashboard') {
-    return loading ? <div>Cargando...</div> : <Dashboard forms={forms} onCreateNew={createNewForm} onSelectForm={selectForm} />;
+    return loading ? (
+      <div className="premium-loader">
+        <div className="loader-circle"></div>
+        <span>Cargando tus formularios...</span>
+      </div>
+    ) : <Dashboard forms={forms} onCreateNew={createNewForm} onSelectForm={selectForm} />;
   }
 
-  if (loading || !currentForm) return <div>Cargando editor...</div>;
+  if (loading || !currentForm) return (
+    <div className="premium-loader">
+      <div className="loader-circle"></div>
+      <span>Abriendo formulario...</span>
+    </div>
+  );
 
   const handleShare = () => {
     const url = `${window.location.origin}/form/${currentForm.metadata.id}`;
@@ -216,8 +227,7 @@ const App: React.FC = () => {
         <div className="nav-tabs">
           <button className={`tab ${activeTab === 'questions' ? 'active' : ''}`} onClick={() => setActiveTab('questions')}>Preguntas</button>
           <button className={`tab ${activeTab === 'responses' ? 'active' : ''}`} onClick={() => {
-            setActiveTab('responses');
-            if (currentFormId) selectForm(currentFormId); // Refresh data
+            if (currentFormId) selectForm(currentFormId, 'responses');
           }}>
             Respuestas <span className="response-count">{currentForm.responses.length}</span>
           </button>
