@@ -291,6 +291,27 @@ export const Dashboard: React.FC<Props> = ({ forms, onCreateNew, onSelectForm })
         .icon-btn:hover { background: rgba(0,0,0,0.05); }
         .icon-btn.mini { padding: 4px; }
         .icon-btn.sort-btn { padding: 8px; }
+
+        @media (max-width: 768px) {
+          .dash-header-left { flex: none; }
+          .dash-logo-text { display: none; }
+          .dash-search-container { flex: 1; padding: 0 8px; }
+          .dash-search-bar { height: 40px; }
+          .dash-header-right { flex: none; gap: 4px; }
+          
+          .template-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+          .forms-list-grid { grid-template-columns: 1fr; gap: 16px; }
+          .section-header { height: auto; flex-direction: column; align-items: flex-start; gap: 8px; margin-bottom: 20px; }
+          .template-gallery-btn { width: 100%; justify-content: space-between; background: white; border: 1px solid #dadce0; }
+          
+          .recent-header { height: auto; flex-direction: column; align-items: flex-start; gap: 12px; }
+          .recent-filters { width: 100%; justify-content: space-between; overflow-x: auto; padding-bottom: 8px; }
+        }
+
+        @media (max-width: 480px) {
+          .template-grid { grid-template-columns: 1fr; }
+          .form-card-preview { height: 120px; }
+        }
       `}</style>
     </div>
   );

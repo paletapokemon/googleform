@@ -217,7 +217,7 @@ const App: React.FC = () => {
             />
           </div>
           <div className="nav-right">
-            <button className="nav-icon-btn" onClick={() => setIsThemeSidebarOpen(true)} title="Personalizar tema"><Palette size={20} /></button>
+            <button className="nav-icon-btn palette-btn" onClick={() => setIsThemeSidebarOpen(true)} title="Personalizar tema"><Palette size={20} /></button>
             <button className="nav-icon-btn" title="Vista previa"><Eye size={20} /></button>
             <button className="nav-icon-btn" title="Deshacer"><Share2 size={20} /></button>
             <button className="send-btn" onClick={handleShare}>Enviar</button>

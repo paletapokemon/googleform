@@ -260,6 +260,20 @@ export const AnalyticsDashboard: React.FC<Props> = ({ form }) => {
         }
         .nav-arrow:hover:not(:disabled) { background: #f1f3f4; color: #202124; }
         .nav-arrow:disabled { opacity: 0.3; cursor: default; }
+
+        @media (max-width: 768px) {
+          .summary-header { flex-direction: column; align-items: flex-start !important; gap: 20px; }
+          .summary-header h2 { font-size: 24px !important; }
+          .sub-tabs { width: 100%; justify-content: space-between; gap: 12px !important; }
+          .icon-btn-outline { width: 100%; justify-content: center; }
+          .individual-view .premium-card { padding: 16px !important; }
+          .individual-view h2 { font-size: 24px !important; }
+        }
+
+        @media (max-width: 480px) {
+          .sub-tab { font-size: 12px; }
+          .nav-arrow { width: 32px; height: 32px; }
+        }
       `}</style>
     </div>
   );
