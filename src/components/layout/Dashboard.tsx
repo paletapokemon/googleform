@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, Search, Menu, MoreVertical, LayoutGrid, List, ChevronDown, Folder } from 'lucide-react';
+import { Search, Menu, MoreVertical, LayoutGrid, List, ChevronDown, Folder } from 'lucide-react';
 import type { SavedForm } from '../../types';
 
 interface Props {
